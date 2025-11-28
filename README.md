@@ -12,7 +12,7 @@ A2K26 là website kỷ niệm dành riêng cho tập thể lớp 10A2‑K26 (THP
 * 👥 **Danh sách học sinh**: Hiển thị đầy đủ 45 thành viên cùng vai trò (lớp trưởng, bí thư,...).
 * 🔐 **Bảo vệ bằng mật khẩu lớp**: Kiểm soát quyền truy cập và upload.
 * 📱 **Responsive Design**: Tối ưu trải nghiệm trên mobile & desktop.
-* 🌙 **Dark Mode**: Chế độ tối thân thiện với mắt.
+<!-- Dark mode removed from features list -->
 * ⚡ **Upload ảnh kèm progress bar**: Phản hồi theo thời gian thực.
 
 ## 🛠️ Công nghệ sử dụng
