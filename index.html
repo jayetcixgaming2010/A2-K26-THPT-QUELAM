@@ -12,9 +12,10 @@
     <link rel="stylesheet" href="style.min.css">
 
     <!-- Preload critical resources -->
-    <link rel="preload" href="logo.png" as="image">
-    <link rel="preload" href="anhlop.png" as="image">
-    <link rel="preload" href="style.css" as="style">
+    <link rel="preload" href="style.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="main.min.js" as="script">
+    <link rel="dns-prefetch" href="cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="unpkg.com">
     
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -70,6 +71,12 @@
     <meta name="image" content="https://10a2k26thptquelam.netlify.app/anhlop.png">
     <meta name="thumbnail" content="https://10a2k26thptquelam.netlify.app/anhlop.png">
     <meta name="photo" content="https://10a2k26thptquelam.netlify.app/anhlop.png">
+    
+<style>
+  /* Critical CSS cho phần đầu trang */
+  .global-loader { display: flex; }
+  #mainContent { display: none; }
+</style>
 </head>
 <body class="bg-memory min-h-screen">
     <!-- Loader Overlay -->
