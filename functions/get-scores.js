@@ -1,37 +1,45 @@
 const { Octokit } = require('@octokit/rest');
+const { getCachedData } = require('./cache-helper');
 
 exports.handler = async (event) => {
-    try {
-        const github = new Octokit({ auth: process.env.GITHUB_TOKEN });
-        const branch = process.env.GITHUB_BRANCH || 'main';
-        
-        const file = await github.repos.getContent({
-            owner: process.env.GITHUB_USER,
-            repo: process.env.GITHUB_REPO,
-            path: 'data/scores.json',
-            ref: branch,
-        });
+  const cacheKey = 'scores-data';
 
-        const content = Buffer.from(file.data.content, 'base64').toString('utf-8');
-        const scores = JSON.parse(content);
-        return {
-            statusCode: 200,
-            body: JSON.stringify(scores),
-            headers: { 'Content-Type': 'application/json' },
-        };
-    } catch (err) {
-        // If file doesn't exist or error, return empty array
-        if (err.status === 404) {
-            return {
-                statusCode: 200,
-                body: JSON.stringify([]),
-                headers: { 'Content-Type': 'application/json' },
-            };
-        }
-        console.error('Error loading scores:', err);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: 'Không thể tải bảng điểm' }),
-        };
+  try {
+    const scoresData = await getCachedData(cacheKey, async () => {
+      const github = new Octokit({ auth: process.env.GITHUB_TOKEN });
+      const file = await github.repos.getContent({
+        owner: process.env.GITHUB_USER,
+        repo: process.env.GITHUB_REPO,
+        path: 'data/scores.json',
+        ref: process.env.GITHUB_BRANCH || 'main'
+      });
+
+      const content = Buffer.from(file.data.content, 'base64').toString('utf-8');
+      return JSON.parse(content);
+    });
+
+    return {
+      statusCode: 200,
+      headers: { 
+        'Content-Type': 'application/json',
+        "Cache-Control": "public, max-age=300, s-maxage=300"
+      },
+      body: JSON.stringify(scoresData)
+    };
+  } catch (err) {
+    // Nếu file không tồn tại, trả về mảng rỗng
+    if (err.status === 404) {
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify([])
+      };
     }
+    
+    console.error('Error loading scores:', err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Không thể tải bảng điểm' })
+    };
+  }
 };

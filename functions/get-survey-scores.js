@@ -1,44 +1,60 @@
 const { Octokit } = require('@octokit/rest');
+const { getCachedData } = require('./cache-helper');
 
-const octokit = new Octokit({
-    auth: process.env.GITHUB_TOKEN
-});
+exports.handler = async (event) => {
+  const cacheKey = 'survey-scores-data';
 
-const REPO_OWNER = 'trungkien2710';
-const REPO_NAME = '10A2-K26';
-const METADATA_FILE = 'data/survey-scores.json';
+  try {
+    const surveyScoresData = await getCachedData(cacheKey, async () => {
+      const github = new Octokit({ auth: process.env.GITHUB_TOKEN });
+      
+      // Lấy nội dung file survey-scores.json từ GitHub
+      const response = await github.repos.getContent({
+        owner: process.env.GITHUB_USER,
+        repo: process.env.GITHUB_REPO,
+        path: 'data/survey-scores.json',
+        ref: process.env.GITHUB_BRANCH || 'main'
+      });
 
-exports.handler = async (event, context) => {
-    try {
-        // Get metadata from GitHub
-        const response = await octokit.repos.getContent({
-            owner: REPO_OWNER,
-            repo: REPO_NAME,
-            path: METADATA_FILE
-        });
+      // Nếu file tồn tại, parse nội dung và trả về
+      if (response.status === 200) {
+        const content = Buffer.from(response.data.content, 'base64').toString('utf-8');
+        const metadata = JSON.parse(content);
+        return metadata;
+      }
 
-        if (response.status === 200) {
-            const content = Buffer.from(response.data.content, 'base64').toString('utf-8');
-            const metadata = JSON.parse(content);
-            return {
-                statusCode: 200,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(metadata)
-            };
-        }
-    } catch (error) {
-        console.error('Error:', error.message);
-        if (error.status === 404) {
-            // File doesn't exist yet
-            return {
-                statusCode: 200,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify([])
-            };
-        }
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ message: 'Error fetching metadata', error: error.message })
-        };
+      // Nếu file không tồn tại, trả về mảng rỗng
+      return [];
+      
+    });
+
+    return {
+      statusCode: 200,
+      headers: { 
+        'Content-Type': 'application/json',
+        "Cache-Control": "public, max-age=300, s-maxage=300"
+      },
+      body: JSON.stringify(surveyScoresData)
+    };
+
+  } catch (error) {
+    // Xử lý trường hợp file không tồn tại (404)
+    if (error.status === 404) {
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify([])
+      };
     }
+
+    // Các lỗi khác
+    console.error('Error fetching survey scores:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ 
+        message: 'Error fetching survey scores data', 
+        error: error.message 
+      })
+    };
+  }
 };
