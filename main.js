@@ -956,30 +956,58 @@ function updateMobilePagination(totalPages) {
     const pag = document.getElementById('studentMobilePagination');
     if (!pag) return;
     pag.innerHTML = '';
-
+    // Build pagination: prev, page numbers, next
     const wrapper = document.createElement('div');
-    wrapper.className = 'inline-flex items-center gap-3';
+    wrapper.className = 'inline-flex items-center gap-2 flex-wrap justify-center';
 
     const prev = document.createElement('button');
     prev.className = 'px-3 py-2 bg-white/10 rounded disabled:opacity-50';
-    prev.textContent = 'Trang trước';
+    prev.setAttribute('aria-label', 'Trang trước');
+    prev.textContent = '‹';
     prev.disabled = studentCurrentPage <= 1;
     prev.onclick = () => { if (studentCurrentPage > 1) renderStudentsPage(studentCurrentPage - 1); };
+    wrapper.appendChild(prev);
 
-    const info = document.createElement('span');
-    info.className = 'px-3 py-2 text-sm';
-    info.textContent = `Trang ${studentCurrentPage} / ${totalPages}`;
+    // render page numbers (compact if many)
+    const maxButtons = 7;
+    let start = Math.max(1, studentCurrentPage - Math.floor(maxButtons/2));
+    let end = start + maxButtons - 1;
+    if (end > totalPages) { end = totalPages; start = Math.max(1, end - maxButtons + 1); }
+
+    for (let p = start; p <= end; p++) {
+        const btn = document.createElement('button');
+        btn.className = `px-3 py-2 rounded ${p===studentCurrentPage? 'bg-purple-600 text-white' : 'bg-white/10'}`;
+        btn.textContent = p;
+        btn.setAttribute('aria-label', `Trang ${p}`);
+        if (p === studentCurrentPage) btn.disabled = true;
+        btn.onclick = (() => { const page = p; return () => renderStudentsPage(page); })();
+        wrapper.appendChild(btn);
+    }
 
     const next = document.createElement('button');
     next.className = 'px-3 py-2 bg-white/10 rounded disabled:opacity-50';
-    next.textContent = 'Trang sau';
+    next.setAttribute('aria-label', 'Trang sau');
+    next.textContent = '›';
     next.disabled = studentCurrentPage >= totalPages;
     next.onclick = () => { if (studentCurrentPage < totalPages) renderStudentsPage(studentCurrentPage + 1); };
-
-    wrapper.appendChild(prev);
-    wrapper.appendChild(info);
     wrapper.appendChild(next);
+
     pag.appendChild(wrapper);
+}
+
+// Show all students at once (desktop)
+function showAllStudents() {
+    const container = document.getElementById('student-container');
+    if (!container) return;
+    container.innerHTML = '';
+    for (let i = 0; i < sortedStudents.length; i++) {
+        const student = sortedStudents[i];
+        renderStudentCard(student, container, i);
+    }
+    displayedCount = sortedStudents.length;
+    // hide desktop controls after showing all
+    const loadMore = document.getElementById('loadMoreContainer');
+    if (loadMore) loadMore.classList.add('hidden');
 }
 
 // Re-render when viewport crosses mobile/desktop threshold
