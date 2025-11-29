@@ -876,14 +876,13 @@ function renderStudents(studentsToRender = students) {
     const countEl = document.getElementById('studentCount');
     if (countEl) countEl.textContent = sortedStudents.length;
 
-    // If mobile: use pagination; otherwise use load-more (desktop)
-    if (isMobile()) {
-        renderStudentsPage(1);
-    } else {
-        // Desktop initial batch
-        loadMoreStudents();
-        setTimeout(updateLoadMoreButton, 150);
-    }
+    // Show all students on both mobile and desktop (remove pagination)
+    showAllStudents();
+    // Hide both mobile and desktop pagination controls if present
+    const mobilePag = document.getElementById('studentMobilePagination');
+    if (mobilePag) mobilePag.classList.add('hidden');
+    const loadMore = document.getElementById('loadMoreContainer');
+    if (loadMore) loadMore.classList.add('hidden');
 }
 
 // Function to render a specific page (mobile pagination)
