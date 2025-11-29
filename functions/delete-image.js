@@ -1,4 +1,4 @@
-export async function handler(event) {
+exports.handler = async function(event) {
   if (event.httpMethod !== "DELETE") {
     return {
       statusCode: 405,

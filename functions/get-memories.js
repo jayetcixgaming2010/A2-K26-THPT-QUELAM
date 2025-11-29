@@ -1,4 +1,6 @@
-export async function handler(event) {
+const { getCachedData } = require('./cache-helper');
+
+exports.handler = async function(event) {
   try {
     const cacheKey = 'memories-data';
     

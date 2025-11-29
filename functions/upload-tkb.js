@@ -29,7 +29,12 @@ exports.handler = async function(event) {
         // Extract base64 from data URL if needed
         let base64Content = file;
         if (file.startsWith('data:')) {
-            base64Content = file.split(',')[1];
+            const parts = file.split(',');
+            if (parts.length === 2) {
+                base64Content = parts[1];
+            } else {
+                throw new Error('Invalid file format');
+            }
         }
 
         // Create file path with timestamp
@@ -112,7 +117,7 @@ exports.handler = async function(event) {
             body: JSON.stringify({
                 message: `Update TKB metadata for TKB số ${tkbNumber} - Lớp ${tkbClass}`,
                 content: Buffer.from(JSON.stringify(tkbData, null, 2)).toString('base64'),
-                sha: fileSha || undefined
+                ...(fileSha && { sha: fileSha })
             })
         });
 

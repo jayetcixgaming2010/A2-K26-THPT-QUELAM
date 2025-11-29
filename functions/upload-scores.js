@@ -3,13 +3,13 @@ const { Octokit } = require('@octokit/rest');
 exports.handler = async (event) => {
     try {
         if (event.httpMethod !== 'POST') {
-            return { statusCode: 405, body: 'Method Not Allowed' };
+            return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
         }
 
         const body = JSON.parse(event.body);
-        const { year, semester, scoreType, file, fileName, fileType } = body;
+        const { year, semester, file, fileName, fileType } = body;
 
-        if (!year || !semester || !scoreType || !file || !fileName) {
+        if (!year || !semester || !file || !fileName) {
             return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields' }) };
         }
 
@@ -19,23 +19,34 @@ exports.handler = async (event) => {
         const ext = fileName.split('.').pop() || 'pdf';
         const filePath = `data/scores/${timestamp}.${ext}`;
 
+        // Extract base64 from data URL if needed
+        let binaryData = file;
+        if (file.startsWith('data:')) {
+            const parts = file.split(',');
+            if (parts.length === 2) {
+                binaryData = parts[1];
+            } else {
+                throw new Error('Invalid file format');
+            }
+        }
+
         // Upload file to GitHub
-        const binaryData = file.split(',')[1];
         await github.repos.createOrUpdateFileContents({
             owner: process.env.GITHUB_USER,
             repo: process.env.GITHUB_REPO,
             path: filePath,
-            message: `Upload scores: ${fileName}`,
+            message: `Upload scores: ${fileName} - ${year} - ${semester}`,
             content: binaryData,
             branch: branch,
         });
 
-        // Determine score type (midterm, final, etc.)
+        // Determine score type
         const typeMap = {
             'mid1': 'Giữa HK1',
             'final1': 'Cuối HK1',
             'mid2': 'Giữa HK2',
             'final2': 'Cuối HK2',
+            'survey': 'Điểm khảo sát'
         };
 
         // Get or create metadata file
@@ -64,8 +75,7 @@ exports.handler = async (event) => {
             id: timestamp.toString(),
             year: year,
             semester: semester,
-            scoreType: scoreType,
-            scoreTypeText: typeMap[scoreType] || scoreType,
+            semesterText: typeMap[semester] || semester,
             fileName: fileName,
             url: `https://raw.githubusercontent.com/${process.env.GITHUB_USER}/${process.env.GITHUB_REPO}/${branch}/${filePath}`,
             uploadedAt: new Date().toISOString(),

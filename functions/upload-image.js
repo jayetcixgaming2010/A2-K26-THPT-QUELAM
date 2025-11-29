@@ -1,4 +1,4 @@
-export async function handler(event) {
+exports.handler = async function(event, context) {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -7,7 +7,14 @@ export async function handler(event) {
   }
 
   try {
-    const { title, date, filename, contentBase64 } = JSON.parse(event.body);
+    const { title, date, filename, contentBase64, password } = JSON.parse(event.body);
+    const CLASS_PASSWORD = process.env.CLASS_PASSWORD;
+    if (!CLASS_PASSWORD) {
+      return { statusCode: 500, body: JSON.stringify({ error: 'Server misconfigured' }) };
+    }
+    if (password !== CLASS_PASSWORD) {
+      return { statusCode: 401, body: JSON.stringify({ error: 'Sai mật khẩu lớp!' }) };
+    }
 
     // Validate input data
     if (!title || !date || !filename || !contentBase64) {
@@ -85,7 +92,7 @@ export async function handler(event) {
       body: JSON.stringify({
         message: `Add memory: ${title}`,
         content: newContent,
-        sha: jsonSha,
+        ...(jsonSha && { sha: jsonSha }),
         branch,
       }),
     });
@@ -107,17 +114,4 @@ export async function handler(event) {
       body: JSON.stringify({ error: err.message || "Unexpected server error" })
     };
   }
-}
-
-exports.handler = async function(event, context) {
-  const parsed = JSON.parse(event.body || '{}');
-  const password = parsed.password;
-  const CLASS_PASSWORD = process.env.CLASS_PASSWORD;
-  if (!CLASS_PASSWORD) {
-    return { statusCode: 500, body: JSON.stringify({ error: 'Server misconfigured' }) };
-  }
-  if (password !== CLASS_PASSWORD) {
-    return { statusCode: 401, body: JSON.stringify({ error: 'Sai mật khẩu lớp!' }) };
-  }
-  return handler(event);
 };
