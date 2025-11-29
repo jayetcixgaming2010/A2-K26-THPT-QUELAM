@@ -667,11 +667,9 @@
                     <label class="block text-gray-700 font-semibold mb-2">Chọn Kì/Loại Bảng Điểm</label>
                     <select id="scoreSemester" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
                         <option value="">-- Chọn --</option>
-                        <option value="mid1">Giữa HK1</option>
-                        <option value="final1">Cuối HK1</option>
-                        <option value="mid2">Giữa HK2</option>
-                        <option value="final2">Cuối HK2</option>
-                        <option value="survey">Khảo Sát</option>
+                        <option value="hk1">HK1</option>
+                        <option value="hk2">HK2</option>
+                        <option value="survey">Khảo sát</option>
                     </select>
                 </div>
                 <div>
@@ -729,48 +727,6 @@
         </div>
     </div>
 
-    <!-- Survey Score Upload Modal -->
-    <div id="surveyScoreUploadModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full shadow-xl">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">Upload Khảo Sát</h3>
-                <button onclick="closeSurveyScoreUploadModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <form id="surveyScoreUploadForm" class="space-y-4">
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Chọn Năm Học</label>
-                    <select id="surveyScoreYear" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
-                        <option value="">-- Chọn năm học --</option>
-                        <option value="2025-2026">2025-2026</option>
-                        <option value="2026-2027">2026-2027</option>
-                        <option value="2027-2028">2027-2028</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Chọn Kỳ/Loại Khảo Sát</label>
-                    <select id="surveyScoreSemester" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
-                        <option value="">-- Chọn --</option>
-                        <option value="mid1">Giữa HK1</option>
-                        <option value="final1">Cuối HK1</option>
-                        <option value="mid2">Giữa HK2</option>
-                        <option value="final2">Cuối HK2</option>
-                        <option value="survey">Khảo Sát</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Chọn file</label>
-                    <input type="file" id="surveyScoreFile" accept=".pdf,.xlsx,.xls,.jpg,.jpeg,.png" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
-                    <p class="text-sm text-gray-500 mt-2">Tối đa 15MB (PDF, Excel, JPG, PNG)</p>
-                </div>
-                <div id="surveyScoreFileName" class="hidden text-sm text-green-600">File: <span id="surveyScoreFileNameText"></span></div>
-                <div class="flex gap-3 mt-6">
-                    <button type="button" onclick="closeSurveyScoreUploadModal()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">Hủy</button>
-                    <button type="button" onclick="uploadSurveyScoreFile()" class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold">Upload</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Bảng Điểm Section -->
     <section id="scores" class="py-20 bg-gradient-to-br from-green-500 via-green-600 to-teal-700 text-white" data-aos="fade-up">
     <div class="max-w-6xl mx-auto px-4">
@@ -804,20 +760,14 @@
                 <button onclick="filterScoresBySemester('all')" class="px-4 py-2 rounded-lg font-semibold transition filter-score-btn active" data-semester="all">
                     <i class="fas fa-th mr-2"></i>Tất Cả
                 </button>
-                <button onclick="filterScoresBySemester('mid1')" class="px-4 py-2 rounded-lg font-semibold transition filter-score-btn bg-white bg-opacity-10" data-semester="mid1">
-                    <i class="fas fa-list mr-2"></i>Giữa HK1
+                <button onclick="filterScoresBySemester('hk1')" class="px-4 py-2 rounded-lg font-semibold transition filter-score-btn bg-white bg-opacity-10" data-semester="hk1">
+                    <i class="fas fa-list mr-2"></i>HK1
                 </button>
-                <button onclick="filterScoresBySemester('final1')" class="px-4 py-2 rounded-lg font-semibold transition filter-score-btn bg-white bg-opacity-10" data-semester="final1">
-                    <i class="fas fa-list mr-2"></i>Cuối HK1
-                </button>
-                <button onclick="filterScoresBySemester('mid2')" class="px-4 py-2 rounded-lg font-semibold transition filter-score-btn bg-white bg-opacity-10" data-semester="mid2">
-                    <i class="fas fa-list mr-2"></i>Giữa HK2
-                </button>
-                <button onclick="filterScoresBySemester('final2')" class="px-4 py-2 rounded-lg font-semibold transition filter-score-btn bg-white bg-opacity-10" data-semester="final2">
-                    <i class="fas fa-list mr-2"></i>Cuối HK2
+                <button onclick="filterScoresBySemester('hk2')" class="px-4 py-2 rounded-lg font-semibold transition filter-score-btn bg-white bg-opacity-10" data-semester="hk2">
+                    <i class="fas fa-list mr-2"></i>HK2
                 </button>
                 <button onclick="filterScoresBySemester('survey')" class="px-4 py-2 rounded-lg font-semibold transition filter-score-btn bg-white bg-opacity-10" data-semester="survey">
-                    <i class="fas fa-list mr-2"></i>Khảo Sát
+                    <i class="fas fa-list mr-2"></i>Khảo sát
                 </button>
             </div>
         </div>
