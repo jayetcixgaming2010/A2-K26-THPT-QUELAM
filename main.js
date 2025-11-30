@@ -1450,21 +1450,8 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // Close image modal
-    window.closeImageModal = function() {
-        const modal = document.getElementById('imageModal');
-        if (modal) {
-            modal.classList.add('hidden');
-            modal.setAttribute('aria-hidden', 'true');
-        }
-        releaseFocusTrap();
-        unlockBodyScroll();
-    };
-
-    // Close student modal
-    window.closeStudentModal = function() {
-        const modal = document.getElementById('studentModal');
-        if (modal) modal.classList.add('hidden');
-    };
+    // Note: closeImageModal and closeStudentModal are defined above (lines 1341-1352)
+    // Do not redefine here to ensure releaseFocusTrap() and unlockBodyScroll() are always called
 
     // Load TKB files
     loadTKBFiles();

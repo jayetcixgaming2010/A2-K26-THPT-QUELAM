@@ -477,15 +477,21 @@ body {
 .memory-grid {
   display: grid !important;
   gap: 1.5rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(1, minmax(0, 1fr)); /* Single column on mobile by default */
 }
-/* 2-3 cards per row on mobile/tablet; more on larger screens */
+/* 2 cards per row on small phones (480px+) */
 @media (min-width: 480px) {
+  .memory-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* 3 cards per row on tablet (640px+) */
+@media (min-width: 640px) {
   .memory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+/* 4 cards per row on larger tablets (768px+) */
 @media (min-width: 768px) {
   .memory-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+/* 5 cards per row on desktop (1024px+) */
 @media (min-width: 1024px) {
   .memory-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
@@ -846,5 +852,47 @@ body {
 button:focus, .filter-btn:focus, .memory-action-btn:focus, input:focus, select:focus {
   outline: none;
   box-shadow: 0 0 0 4px rgba(123,47,247,0.14);
+}
+
+/* Mobile input improvements: prevent iOS zoom on input focus, fix touch appearance */
+@supports (-webkit-appearance: none) {
+  input, select, textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    font-size: 16px; /* Prevents iOS zoom on focus when font-size < 16px */
+    border-radius: 6px;
+  }
+
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="month"],
+  input[type="week"],
+  input[type="email"],
+  input[type="number"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="text"],
+  input[type="url"],
+  select,
+  textarea {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Remove tap highlight on iOS */
+  button, a, input, select, textarea {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+}
+
+/* Ensure text inputs are readable on mobile without zoom */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+    min-height: 44px;
+  }
 }
 

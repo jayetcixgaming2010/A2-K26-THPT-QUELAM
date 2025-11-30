@@ -999,7 +999,31 @@
                         try { updateUploadButtonUI(); } catch (e) { console.warn('updateUploadButtonUI failed', e); }
                     }
 
-                    console.debug('post-load overrides applied: AOS init + upload UI');
+                    // Ensure modal close functions properly call focus/scroll cleanup
+                    // This fixes a bug where duplicate definitions existed without releaseFocusTrap()/unlockBodyScroll()
+                    if (typeof releaseFocusTrap === 'function' && typeof unlockBodyScroll === 'function') {
+                        window.closeStudentModal = function() {
+                            const modal = document.getElementById('studentModal');
+                            if (modal) {
+                                modal.classList.add('hidden');
+                                modal.setAttribute('aria-hidden', 'true');
+                            }
+                            releaseFocusTrap();
+                            unlockBodyScroll();
+                        };
+
+                        window.closeImageModal = function() {
+                            const modal = document.getElementById('imageModal');
+                            if (modal) {
+                                modal.classList.add('hidden');
+                                modal.setAttribute('aria-hidden', 'true');
+                            }
+                            releaseFocusTrap();
+                            unlockBodyScroll();
+                        };
+                    }
+
+                    console.debug('post-load overrides applied: AOS init + upload UI + modal focus cleanup');
                 } catch (e) {
                     console.warn('post-load override error', e);
                 }
